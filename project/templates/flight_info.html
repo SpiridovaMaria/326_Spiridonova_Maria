@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% extends "base.html" %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'show_info.css' %}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    {% block content %}
+        <aside class="profile-card">
+       <header>
+            <h1>{{ flight.number_flight }}</h1>
+
+            <!-- and role or location -->
+            <h2>Information:</h2>
+      </header>
+
+      <!-- bit of a bio; who are you? -->
+      <div class="profile-bio">
+          <p><b>Airline: </b>{{ flight.airline.name }}</p>
+          <p><b>Destination:</b> {{ flight.destination }}</p>
+          <p> <b> Passengers: </b>{{ number_of_passengers }}</p>
+          <p><b>Date of flight:</b> {{ flight.date_of_flight }} <b>Time of flight: </b> {{ flight.time_flight }} </p>
+          <p><b>Registration:</b>{% if flight.registration %} Started {% else %} Closed {% endif %}
+              <b>Check-in: </b>{{ flight.check_in}}</p>
+           <h2>Passengers:</h2>
+          <table class="table">
+              <thead>
+                <tr>
+                  <th scope="Passanger">Passenger</th>
+                  <th scope="Baggage">Baggage</th>
+                  <th scope="Extra service">Extra services</th>
+                    <th></th>
+                </tr>
+              </thead>
+          <tbody>
+           {% for passenger in passengers %}
+            <tr>
+              <td>{{ passenger.id_passenger.surname}} {{ passenger.id_passenger.name }} {{ passenger.id_passenger.patronymic }}</td>
+              <td>
+                  {% if passenger.with_baggage %}
+                    {{ passenger.baggage_weight }} kg
+                  {% else %}
+                    No
+                  {% endif %}
+              </td>
+              <td>
+                  {% for service in passenger.extra_service.all %}
+                        {{ service.service_name}}<br>
+                    {% endfor %}
+                    {% if passenger.extra_service.count == 0 %}
+                        No
+                    {% endif %}
+              </td>
+                <td>
+                    <a class="btn btn-primary" href="info/{{ passenger.id_passenger.passport }}" role="button">More</a>
+                </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+          </table>
+        </div>
+
+      <!-- some social links to show off -->
+
+    </aside>
+    {% endblock %}
+</body>
+</html>

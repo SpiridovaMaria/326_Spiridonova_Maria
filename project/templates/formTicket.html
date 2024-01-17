@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Buy a ticket</title>
+     {% extends "base.html" %}
+    {% load crispy_forms_tags %}
+    {% load static %}
+    <style>
+        checkbox{
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}
+         <aside class="profile-card">
+        <form method="post" class="mx-auto my-5 form_ticket" style = "width:500px; font-size: 150%">
+            <h2>Покупка билета</h2>
+            {% csrf_token %}
+            {{ form.id_flight | as_crispy_field}}
+            <div class="row g-3" style="margin-bottom: 0px">
+                <div class = "col" style="margin-bottom: 0px;">
+                    {{ form.with_baggage | as_crispy_field}}
+                </div>
+                <div class="col" style="margin-bottom: 0px">
+                    {{ form.baggage_weight | as_crispy_field }}<br>
+                </div>
+            </div>
+            <div class="col my-0">
+                {{ form.extra_service | as_crispy_field}}<br>
+            </div>
+            <button class="btn btn-primary" id="buy_ticket" type="submit">Купить</button>
+        </form>
+         </aside>
+    {% block javascript %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function (){
+                $(function() {
+                    $.ajax(
+                        {
+                        data: $('#id_id_flight').serialize(),
+                        url: "{% url 'validate_flight' %}",
+                        success:
+                            function(response){
+                                    if ($('#flightError').length == 0)
+                                        $('#id_id_flight').after('<p class="my-0 text-center invalid-feedback container" id="flightError"></p>');
+                                    if (response.exists==true){
+                                        $('#id_id_flight').removeClass('is-valid').addClass('is-invalid');
+                                        $('#flightError').removeClass('valid-feedback').addClass('invalid-feedback').text("Вы уже купили билеты на этот рейс.");
+                                        $('#buy_ticket').prop('disabled',true);
+                                    }
+                                    else{
+                                        $('#id_id_flight').removeClass('is-invalid').addClass('is-valid');
+                                        $('#flightError').removeClass('invalid-feedback').addClass('valid-feedback').text("Рейс выбран корректно.");
+                                        $('#buy_ticket').prop('disabled',false);
+                                    }
+                            },
+                        error:
+                            function(response){
+                                console.log(response.responseJSON.errors);
+                            }
+                    });
+                    return false;
+                });
+                $('#id_id_flight').click(function() {
+                    $.ajax(
+                        {
+                        data: $('#id_id_flight').serialize(),
+                        url: "{% url 'validate_flight' %}",
+                        success:
+                            function(response){
+                                    if ($('#flightError').length == 0)
+                                        $('#id_id_flight').after('<p class="my-0 text-center invalid-feedback container" id="flightError"></p>');
+                                    if (response.exists==true){
+                                        $('#id_id_flight').removeClass('is-valid').addClass('is-invalid');
+                                        $('#flightError').removeClass('valid-feedback').addClass('invalid-feedback').text("Вы уже купили билеты на этот рейс.");
+                                        $('#buy_ticket').prop('disabled',true);
+                                    }
+                                    else{
+                                        $('#id_id_flight').removeClass('is-invalid').addClass('is-valid');
+                                        $('#flightError').removeClass('invalid-feedback').addClass('valid-feedback').text("Рейс выбран корректно.");
+                                        $('#buy_ticket').prop('disabled',false);
+                                    }
+                            },
+                        error:
+                            function(response){
+                                console.log(response.responseJSON.errors);
+                            }
+                    });
+                    return false;
+                });
+            });
+        </script>
+    {% endblock javascript %}
+    {% endblock %}
+</body>
+</html>

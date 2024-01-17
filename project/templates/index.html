@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Авторизация</title>
+    {% load static %}
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="slide navbar style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<!-- partial:index.partial.html -->
+
+<body>
+	<div class="main">
+		<input type="checkbox" id="chk" aria-hidden="true">
+			<div class="signup">
+				<form method="post">
+                    {% csrf_token %}
+					<label for="chk" aria-hidden="true">Регистрация</label>
+                    <input type="text" class ="w-75" name="create_surname" placeholder="Фамилия" required="">
+					<input type="text" class ="w-75" name="create_name" placeholder="Имя" required="">
+                    <input type="text" class ="w-75" name="create_patronymic" placeholder="Отчество" required="">
+                    <input type="date" class ="w-75" name="create_birthdate" placeholder="Дата рождения" required="">
+                    <input type="number" class ="w-75" name="create_passport" id="create_passport" placeholder="Номер пасспорта" required="">
+					<input type="email"  class ="w-75" name="create_email" id ="create_email" placeholder="Email" required="">
+					<input type="password" class ="w-75" name="create_pswd" placeholder="Пароль" required="">
+					<button id ="register_passenger">Зарегистрироваться</button>
+				</form>
+			</div>
+
+			<div class="login">
+				<form method="post">
+                    {% csrf_token %}
+					<label for="chk" aria-hidden="true">Login</label>
+					<input type="email" name="email" placeholder="Email" required="">
+					<input type="password" name="password" placeholder="Пароль" required="">
+					<button>Войти</button>
+				</form>
+			</div>
+	</div>
+    {% block javascript %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
+            var flagP = true;
+            var flagEm = true;
+            $(document).ready(function (){
+                $('#create_passport').keyup(function() {
+                    $.ajax(
+                        {
+                        data: $(this).serialize(),
+                        url: "{% url 'validate_passport' %}",
+                        success:
+                            function(response){
+                                    if ($('#passportError').length == 0)
+                                        $('#create_passport').after('<p class="my-0 text-center invalid-feedback container" id="passportError"></p>');
+                                    if (response.taken==true){
+                                        $('#create_passport').removeClass('is-valid').addClass('is-invalid');
+                                        $('#passportError').removeClass('valid-feedback').addClass('invalid-feedback').text("Пользователь с таким номером паспорта существует.");
+                                        $('#register_passenger').prop('disabled',true);
+                                        $('#create_passport').addClass("mb-0")
+                                        flagP = false;
+                                    }
+                                    else{
+                                        $('#create_passport').removeClass('is-invalid').addClass('is-valid');
+                                        $('#passportError').removeClass('invalid-feedback').addClass('valid-feedback').text("Номер паспорта введен корректно.");
+                                        if (flagEm)
+                                            $('#register_passenger').prop('disabled',false);
+                                        flagP = true;
+                                        $('#create_passport').addClass("mb-0")
+                                    }
+                            },
+                        error:
+                            function(response){
+                                console.log(response.responseJSON.errors);
+                            }
+                    });
+                    return false;
+                });
+                $('#create_email').keyup(function() {
+                    $.ajax(
+                        {
+                        data: $(this).serialize(),
+                        url: "{% url 'validate_email' %}",
+                        success:
+                            function(response){
+                                    if ($('#emailError').length == 0)
+                                        $('#create_email').after('<p class="my-0 text-center invalid-feedback container" id="emailError"></p>');
+                                    if (response.exists==true){
+                                        $('#create_email').removeClass('is-valid').addClass('is-invalid');
+                                        $('#emailError').removeClass('valid-feedback').addClass('invalid-feedback').text("Пользователь с таким email существует.");
+                                        $('#register_passenger').prop('disabled',true);
+                                        flagEm = false;
+                                        $('#create_email').addClass("mb-0")
+                                    }
+                                    else{
+                                        $('#create_email').removeClass('is-invalid').addClass('is-valid');
+                                        $('#emailError').removeClass('invalid-feedback').addClass('valid-feedback').text("Email введен корректно.");
+                                        if(flagP)
+                                            $('#register_passenger').prop('disabled',false);
+                                        flagEm = true;
+                                        $('#create_email').addClass("mb-0")
+                                    }
+                            },
+                        error:
+                            function(response){
+                                console.log(response.responseJSON.errors);
+                            }
+                    });
+                    return false;
+                });
+            });
+        </script>
+    {% endblock javascript %}
+</body>
+</html>
+<!-- partial -->

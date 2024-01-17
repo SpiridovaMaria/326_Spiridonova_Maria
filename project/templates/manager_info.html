@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет менеджера</title>
+    {% extends "base.html" %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'show_info.css' %}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    {% block content %}
+        <div class = "container">
+            <div class="d-grid gap-2 col-4" style="margin: auto;margin-top: 3vh;">
+                <h1> Flights: </h1>
+                {% for flight in flights %}
+                    <a class="btn btn-primary" href="/flight_info/{{ flight.number_flight }}" role="button">{{ flight.number_flight}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endblock %}
+</body>
+</html>
